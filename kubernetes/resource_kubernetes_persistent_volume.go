@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	pkgApi "k8s.io/apimachinery/pkg/types"
-	kubernetes "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes"
 )
 
 func resourceKubernetesPersistentVolume() *schema.Resource {
@@ -85,6 +85,13 @@ func resourceKubernetesPersistentVolume() *schema.Resource {
 							Required:     true,
 							Elem:         schema.TypeString,
 							ValidateFunc: validateResourceList,
+						},
+						"mount_options": {
+							Type:        schema.TypeSet,
+							Description: "Contains all options for volumes to be mounted. More info: http://kubernetes.io/docs/user-guide/persistent-volumes",
+							Required:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Set:         schema.HashString,
 						},
 						"persistent_volume_reclaim_policy": {
 							Type:        schema.TypeString,

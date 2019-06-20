@@ -271,6 +271,14 @@ func expandPersistentVolumeAccessModes(s []interface{}) []api.PersistentVolumeAc
 	return out
 }
 
+func expandPersistentVolumeMountOptions(s []interface{}) []string {
+	var out []string
+	for _, v := range s {
+		out = append(out, v.(string))
+	}
+	return out
+}
+
 func flattenResourceQuotaSpec(in api.ResourceQuotaSpec) []interface{} {
 	out := make([]interface{}, 1)
 

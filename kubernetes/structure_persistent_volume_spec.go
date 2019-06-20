@@ -376,6 +376,9 @@ func flattenPersistentVolumeSpec(in v1.PersistentVolumeSpec) []interface{} {
 	if in.NodeAffinity != nil {
 		att["node_affinity"] = flattenVolumeNodeAffinity(in.NodeAffinity)
 	}
+	if in.MountOptions != nil {
+		att["mount_options"] = in.MountOptions
+	}
 	return []interface{}{att}
 }
 
@@ -947,6 +950,9 @@ func expandPersistentVolumeSpec(l []interface{}) (*v1.PersistentVolumeSpec, erro
 	if v, ok := in["node_affinity"].([]interface{}); ok && len(v) > 0 {
 		obj.NodeAffinity = expandVolumeNodeAffinity(v)
 	}
+	if v, ok := in["mount_options"].(*schema.Set); ok && v.Len() > 0 {
+		obj.MountOptions = expandPersistentVolumeMountOptions(v.List())
+	}
 	return obj, nil
 }
 
@@ -1088,6 +1094,13 @@ func patchPersistentVolumeSpec(pathPrefix, prefix string, d *schema.ResourceData
 		ops = append(ops, &ReplaceOperation{
 			Path:  pathPrefix + "/accessModes",
 			Value: expandPersistentVolumeAccessModes(v.List()),
+		})
+	}
+	if d.HasChange(prefix + "mount_options") {
+		v := d.Get(prefix + "mount_options").(*schema.Set)
+		ops = append(ops, &ReplaceOperation{
+			Path:  pathPrefix + "/mountOptions",
+			Value: expandPersistentVolumeMountOptions(v.List()),
 		})
 	}
 	if d.HasChange(prefix + "persistent_volume_reclaim_policy") {
